@@ -4,12 +4,10 @@ export class AudioSocket {
     socket: Socket;
     port: number;
 
-
     constructor(socket: Socket, port: number) {
         this.socket = socket
         this.port = port
     }
-
 
     static async create(): Promise<AudioSocket> {
         const socket = createSocket("udp4");
