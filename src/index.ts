@@ -16,7 +16,7 @@ class DiscordPodcasts {
     }
 
     async getPodcast(id: number): Promise<Podcast | null> {
-        const result = await fetch(`${rest}?podcast=${id}`, {
+        const result = await fetch(`${rest}/podcast?id=${id}`, {
             headers: this.getAuthHeaders()
         })
         if (result.status === 200) {
@@ -75,7 +75,7 @@ async function main() {
     const createdPodcast = await discordPodcasts.createPodcast(ip)
     console.log(createdPodcast)
 
-    const fetchedPodcast = await discordPodcasts.listPodcasts()
+    const fetchedPodcast = await discordPodcasts.getPodcast(createdPodcast.id)
     console.log(fetchedPodcast)
 }
 
