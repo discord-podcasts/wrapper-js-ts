@@ -22,20 +22,27 @@ export class Podcast {
     gateway: Gateway | null
     audioSocket: AudioSocket | null
 
-
-    constructor(response: PodcastResponse) {
-        this.id = response.id
-        this.host = response.host
-        this.activeSince = response.activeSince
-
-        this.gateway = null
-        this.audioSocket = null
+    constructor(id: number, host: string, activeSince: number | null, gateway: Gateway | null, audioSocket: AudioSocket | null) {
+        this.id = id
+        this.host = host
+        this.activeSince = activeSince
+        this.gateway = gateway
+        this.audioSocket = audioSocket
     }
 
-    static create(id: number, host: string, gateway: Gateway, audioSocket: AudioSocket): Podcast {
-        return new Podcast({
-            id, host, activeSince: null, gateway, audioSocket
-        })
+    static createFromResponse(response: PodcastResponse): Podcast {
+        return new Podcast(response.id, response.host, response.activeSince, null, null);
+    }
+
+    public toShortString(): string {
+        return `
+            id: ${this.id}
+            host: ${this.host}
+            activeSince: ${this.activeSince}
+            
+            ws connected: ${this.gateway != null}
+            udp connected: ${this.audioSocket != null}
+        `.replace(/^ +/gm, '')
     }
 
 }

@@ -21,7 +21,7 @@ export class DiscordPodcasts {
         })
         if (result.status === 200) {
             const response: PodcastResponse = await result.json()
-            return new Podcast(response)
+            return Podcast.createFromResponse(response)
         } else if (result.status === 404) {
             return null
         } else {
@@ -35,7 +35,7 @@ export class DiscordPodcasts {
         })
         if (result.status === 200) {
             const response: ListPodcastsResponse = await result.json()
-            return response.podcasts.map(podcast => new Podcast(podcast))
+            return response.podcasts.map(podcast => Podcast.createFromResponse(podcast))
         } else if (result.status === 404) {
             return null
         } else {
@@ -57,12 +57,14 @@ export class DiscordPodcasts {
         gateway.send(EventType.CONNECTED, {ip, port: audioSocket.port} as ConnectedEvent)
         const clientJoinEvent = await gateway.awaitEvent(EventType.CLIENT_JOIN)
 
-        const podcast = Podcast.create(
+        const podcast = new Podcast(
             helloEvent.podcast_id,
             this.clientId,
+            null,
             gateway,
             audioSocket
         )
+
         return podcast
     }
 
