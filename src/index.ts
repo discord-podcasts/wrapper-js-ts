@@ -4,7 +4,7 @@ import {AudioSocket} from "./audio-socket.js";
 
 const rest = "https://podcasts.myra.bot"
 
-class DiscordPodcasts {
+export class DiscordPodcasts {
     clientId = "123"
     clientSecret = "nR2ZtDixLiz4BmMNF1Mz8K7n3EajRzHa"
 
@@ -67,16 +67,3 @@ class DiscordPodcasts {
     }
 
 }
-
-async function main() {
-    const ip = ""
-
-    const discordPodcasts = new DiscordPodcasts()
-    const createdPodcast = await discordPodcasts.createPodcast(ip)
-    console.log(createdPodcast)
-
-    const fetchedPodcast = await discordPodcasts.getPodcast(createdPodcast.id)
-    console.log(fetchedPodcast)
-}
-
-await main()

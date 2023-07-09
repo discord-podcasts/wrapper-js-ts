@@ -7,6 +7,6 @@
     "outDir": "dist",
     "strict": true
   },
-  "include": ["src"],
+  "include": ["src", "tests"],
   "exclude": ["node_modules", "**/__tests__/*"]
 }
