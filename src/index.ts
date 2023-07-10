@@ -1,12 +1,21 @@
 import {ListPodcastsResponse, Podcast, PodcastResponse} from "./podcast.js";
 import {ConnectedEvent, EventType, Gateway, HelloEvent} from "./gateway.js";
 import {AudioSocket} from "./audio-socket.js";
+import sodium from "libsodium-wrappers";
+
+export let encryptionSecret: Uint8Array
 
 const rest = "https://podcasts.myra.bot"
 
 export class DiscordPodcasts {
     clientId = "123"
     clientSecret = "nR2ZtDixLiz4BmMNF1Mz8K7n3EajRzHa"
+
+    static async create() {
+        await sodium.ready
+        encryptionSecret = sodium.randombytes_buf(32)
+        return new DiscordPodcasts()
+    }
 
     getAuthHeaders() {
         return {
@@ -45,15 +54,11 @@ export class DiscordPodcasts {
 
     async createPodcast(ip: string): Promise<Podcast> {
         const gateway = new Gateway(this.getAuthHeaders())
-        gateway.onEvent(event => {
-            console.log("gateway event")
-            console.log(event)
-        })
 
         const helloEvent = await gateway.awaitEvent(EventType.HELLO)
             .then(event => event.data as HelloEvent)
 
-        const audioSocket = await AudioSocket.create()
+        const audioSocket = await AudioSocket.create(helloEvent.port, encryptionSecret)
         gateway.send(EventType.CONNECTED, {ip, port: audioSocket.port} as ConnectedEvent)
         const clientJoinEvent = await gateway.awaitEvent(EventType.CLIENT_JOIN)
 

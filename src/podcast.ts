@@ -1,4 +1,4 @@
-import {Gateway} from "./gateway.js";
+import {ConnectedEvent, EventType, Gateway, HelloEvent} from "./gateway.js";
 import {AudioSocket} from "./audio-socket.js";
 
 export interface PodcastResponse {
@@ -32,6 +32,21 @@ export class Podcast {
 
     static createFromResponse(response: PodcastResponse): Podcast {
         return new Podcast(response.id, response.host, response.activeSince, null, null);
+    }
+
+    // TODO dont put credentials as params
+    public async connect(clientId: string, clientSecret: string, encryptionSecret: Uint8Array, ip: string) {
+        const gateway = new Gateway({client_id: clientId, client_secret: clientSecret})
+
+        const helloEvent = await gateway.awaitEvent(EventType.HELLO)
+            .then(event => event.data as HelloEvent)
+
+        const audioSocket = await AudioSocket.create(helloEvent.port, encryptionSecret)
+        gateway.send(EventType.CONNECTED, {ip, port: audioSocket.port} as ConnectedEvent)
+        const clientJoinEvent = await gateway.awaitEvent(EventType.CLIENT_JOIN)
+
+        this.gateway = gateway
+        this.audioSocket = audioSocket
     }
 
     public toShortString(): string {

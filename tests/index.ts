@@ -1,14 +1,28 @@
 import {DiscordPodcasts} from "../src/index.js";
+import {Client, Events, GatewayIntentBits} from "discord.js";
+import {hostPodcast} from "./host.js";
+import {listenPodcast} from "./client.js";
 
-async function main() {
-    const ip = ""
+const token = BOT_TOKEN
+export const discordPodcasts = await DiscordPodcasts.create()
+export const ip = await fetch("https://api.ipify.org?format=json")
+    .then(res => res.json())
+    .then(res => res.ip)
+export const client = new Client({
+    intents: [
+        GatewayIntentBits.Guilds,
+        GatewayIntentBits.GuildVoiceStates
+    ]
+});
 
-    const discordPodcasts = new DiscordPodcasts()
-    const createdPodcast = await discordPodcasts.createPodcast(ip)
-    console.log(createdPodcast)
+client.once(Events.ClientReady, c => {
+    console.log(`Ready! Logged in as ${c.user.tag}`);
+});
+client.on(Events.InteractionCreate, async (interaction) => {
+    if (!interaction.isCommand()) return
+    const name = interaction.commandName
+    if (name === "host") await hostPodcast(interaction)
+    else if (name === "listen") await listenPodcast(interaction)
+});
 
-    const fetchedPodcast = await discordPodcasts.getPodcast(createdPodcast.id)
-    console.log(fetchedPodcast)
-}
-
-await main()
+await client.login(token);
